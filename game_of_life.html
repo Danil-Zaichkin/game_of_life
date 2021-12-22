@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+</head>
+<body>
+
+    <canvas id="myCanvas" width="600px" height="600px"
+            style="border:1px solid #c3c3c3;">
+        Your browser does not support the canvas element.
+    </canvas>
+    <script>
+        function neighborCount(x, y) {
+            let count = 0;
+            for (let i = -1; i <= 1; i++)
+                for (let j = -1; j <= 1; j++) {
+                    if (i===0 && j===0)
+                        continue
+                    else
+                        count += curField[(x+i+fieldSize)%fieldSize][(y+j+fieldSize)%fieldSize]
+                }
+            return count;
+        }
+
+        function nextGen() {
+            for (let i = 0; i < fieldSize; i++)
+                for (let j = 0; j < fieldSize; j++) {
+                    if (curField[i][j] === 0) {
+                        if (neighborCount(i, j) === 3)
+                            nextField[i][j] = 1
+                        else
+                            nextField[i][j] = 0
+                    } else {
+                        if (neighborCount(i, j) < 2 || neighborCount(i, j) > 3)
+                            nextField[i][j] = 0
+                        else
+                            nextField[i][j] = 1
+                    }
+                }
+            for (let i = 0; i < fieldSize; i++)
+                for (let j = 0; j < fieldSize; j++)
+                    curField[i][j] = nextField[i][j]
+            draw()
+        }
+
+        function draw() {
+            for (let i = 0; i < fieldSize; i++)
+                for (let j = 0; j < fieldSize; j++) {
+                    if (curField[i][j] === 1) {
+                        ctx.fillStyle = "#000000";
+                        ctx.fillRect(i * cellSize, j * cellSize, cellSize, cellSize);
+                    } else {
+                        ctx.fillStyle = "#FFFFFF";
+                        ctx.fillRect(i * cellSize, j * cellSize, cellSize, cellSize);
+                    }
+                }
+        }
+
+        let fieldSize = 30;
+        let cellSize = 20;
+        let curField = new Array(fieldSize);
+        let nextField = new Array(fieldSize);
+        for (let i = 0; i < fieldSize; i++) {
+            curField[i] = new Array(fieldSize);
+            nextField[i] = new Array(fieldSize);
+        }
+        let canvas = document.getElementById("myCanvas");
+        let ctx = canvas.getContext("2d");
+        //initialization: first gen
+        for (let i = 0; i < fieldSize; i++)
+            for (let j = 0; j < fieldSize; j++) {
+                curField[i][j] = 1*(Math.random() > 0.5);
+            }
+
+        draw();
+        let tm = setInterval(nextGen, 100  );
+    </script>
+</body>
+</html>
